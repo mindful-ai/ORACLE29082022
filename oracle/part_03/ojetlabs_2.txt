@@ -1,0 +1,1002 @@
+-----------------------------------------------------------------------------------
+LAB 7
+-----------------------------------------------------------------------------------
+Objective:
+To explore the OJET cookbook
+To learn to adopt cookbook components into OJET projects
+
+Step 1:
+Paste the following code in dashboard.html replacing the city transport statistics chart
+
+<oj-chart type = "pie" series ="[[datasource]]">
+</oj-chart>
+
+Test if it is working. This is an alternative to ojComponent.
+The details can be found in the OJET Cookbook. Browse the OJET Cookbook for this components
+and observe how it is oraganized and many other parameters of the oj-chart.
+
+Step 2:
+
+Let's give an option to the user to choose the representation of the
+city statistics either using a pie chart or a bar chart
+
+Explore and discuss which is the best component to use
+Say the following is shortlisted. Let's see how we can incorporate it
+into our app
+
+Forms > Select > Select Single > Basic
+
+    a. Explore how it works
+    b. Analyse the html code
+    c. Analyze the js code and look into the observables
+    d. Modify the code according to your needs
+    e. Copy the code snippets into the application
+    f. Remember to add the module to requirements list in js file
+    g. Hook-up and test
+
+After getting the results in the Cookbook Playground
+
+HTML code copied:
+
+  <h3>Please keep in mind city transport statistics</h3>
+  <!--
+  <div data-bind="ojComponent:{ component: 'ojChart', type: 'bar', series: datasource }">
+  -->
+
+  <div id="containerDiv">
+    
+    <oj-label for="select1">Select Single with ArrayDataProvider</oj-label>
+            
+    <oj-select-single id="select1"
+              style="max-width:20em"
+              data="[[chartsDP]]" 
+              value="{{selectVal}}">
+    </oj-select-single>
+    
+    <br/>
+    <br/>
+            
+    <div> 
+
+      <oj-label for="selectedval">Current selected value is</oj-label>
+      
+      <span id="selectedval">
+        <oj-bind-text value="[[selectVal]]"></oj-bind-text>
+      </span>
+
+    </div>
+
+  </div>
+
+  <oj-chart type = "[[selectVal]]" series ="[[datasource]]">
+  </oj-chart>
+
+JS code copied:
+
+    self.selectVal = ko.observable('pie');
+
+    var chartoptions = [
+        { value: 'pie', label: 'pie' },
+        { value: 'bar', label: 'bar' }
+      ];
+  
+    this.chartsDP = new ArrayDataProvider(chartoptions, { keyAttributes: 'value' });
+
+Module reference: 
+'ojs/ojarraydataprovider'
+'ojs/ojselectsingle'
+
+Do you get the results?
+
+Step 3:
+
+Debug using developer tools of the user as instructed by the instructor
+
+Step 4:
+
+Fix the error
+
+Step 5:
+
+CREATIVE LAB:
+-----------------------------------------------------------------------------------
+
+Instead of age input date of birth such as 15-12-1999
+Age should be calculculated and displayed in the statement
+"Your name is Raj and age is 35"
+Note: You may have to use date converters in oracle JET
+
+CREATIVE LAB: (Optionally do this as an assignment)
+-----------------------------------------------------------------------------------
+1. Re-do prime numbers assignment with OJET components
+2. Re-do currency converter using OJET components
+   Additionally add more currency options, get ideas from google converter
+3. Implement the calculator using OJET components
+
+-----------------------------------------------------------------------------------
+LAB 8: Working with oj-table component
+-----------------------------------------------------------------------------------
+Objective:
+To study the features of oj-table component
+
+
+Part 1: Implementation
+-----------------------------------------------------------------------------------
+
+View:
+Access https://docs.oracle.com/en/middleware/developer-tools/jet/7.2/develop/whats-new-this-guide-release-7.2.0.html
+copy the <oj-table></oj-table>
+
+ViewModel:
+
+Required Modules:
+"knockout", "ojs/ojarraydataprovider", "ojs/ojtable"
+
+1. Use tabledata.txt to create the array required for the table: say deptArray
+2. Wrap the data in ArrayDataProvider and feed it to oj-table
+   self.dataProvider = new ArrayDataProvider(self.deptArray, {keyAttributes: 'DepartmentId'});
+
+Part 2: Making the table sortable
+-----------------------------------------------------------------------------------
+
+View:
+Use "sortable": "enabled" in DepartmentName column
+
+Part 3: Adding Pagination
+-----------------------------------------------------------------------------------
+
+View:
+
+Add at the bottom of the table:
+    <oj-paging-control id="paging" data='[[]]' page-size='5' slot='bottom'>
+    </oj-paging-control>
+
+ViewModel:
+
+Required Modules:
+"ojs/ojpagingcontrol", "ojs/ojpagingdataproviderview"
+
+Wrap the ArrayDataProvider with PagingDataProviderView and feed it to data attribute 
+of the paging controller and the table as well
+    self.pagingDataProvider =  new PagingDataProviderView(new ArrayDataProvider(self.deptArray, {keyAttributes: 'DepartmentId'}));
+
+
+Update the view with pagingDataProvider for data attribute in oj-table and oj-paging-control
+
+Part 4: Implementing Drag and Drop
+-----------------------------------------------------------------------------------
+
+View:
+
+1. Create another table in the same view, call them master and slave
+2. Call the data input dataProvider2
+3. Add the following properties to master table:
+                selection-mode='{"row": "multiple", "column": "multiple"}'
+                dnd.drag.rows.data-types='["application/ojtablerows+json"]'
+4. Add the following properties to slave table:
+                selection-mode='{"row": "multiple", "column": "multiple"}'
+                dnd.drop.rows.data-types='["application/ojtablerows+json"]'
+                dnd.drop.rows.drop='[[handleDropRows]]'
+
+ViewModel:
+
+1. Create a small dataArray similar to Master table data array and feed it to slave table
+   Remember to make it ko.observableArray()
+
+2. Implement the handleDropRows function:
+   This function should basically trasfer the dragged data into dataArray for slave table
+
+    self.handleDropRows = (event, context) => {
+        const dragData = event.dataTransfer.getData("application/ojtablerows+json");
+        if (dragData) {
+            const dragDataArray = JSON.parse(dragData);
+            console.log(dragDataArray);
+            for (let i = 0; i < dragDataArray.length; i++) {
+                console.log(dragDataArray[i].data);
+                self.dataArray.push(dragDataArray[i].data);
+                //Alternatively splice() can be used as well
+            }
+        }
+        console.log(self.dataArray);
+      };
+
+Part 5: Implementing the filtering functionality
+-----------------------------------------------------------------------------------
+view: incidents.html
+
+1. Copy the table as in part 1
+2. Create a input component, this will become the filtering string input for the table
+
+    <oj-input-text id="filter" class="oj-form-control-max-width-md" label-hint="Filter" label-edge="inside"
+                   placeholder="Type to filter" on-raw-value-changed="[[handleValueChanged]]" value="{{filter}}" clear-icon="always">
+    </oj-input-text>
+
+ViewModel: dashboard.js
+
+Modules needed:
+"knockout", "ojs/ojarraydataprovider",  
+"ojs/ojlistdataproviderview", "ojs/ojknockout","ojs/ojtable","ojs/ojinputtext"
+
+1. Create a observable for the filtering input
+   this.filter = ko.observable();
+2. Copy data from tabledata.txt to create baseArray
+3. Write a replicator function to generate larger array, this step is to just 
+   create a "seemingly" large data for the table. 
+
+         this.generateDeptArray = (num) => {
+          const deptArray = [];
+          let count = 0;
+          for (let i = 0; i < num; i++) {
+              for (let j = 0; j < this.baseDeptArray.length; j++) {
+                  deptArray[count] = Object.assign({}, this.baseDeptArray[j]);
+                  deptArray[count].DepartmentId += count.toString();
+                  deptArray[count].DepartmentName += count.toString();
+                  count++;
+              }
+          }
+          return deptArray;
+      };
+      this.deptArray = this.generateDeptArray(2);
+4. Capture the raw value from the filter input by implementing the handleValueChanged
+   callback function in oj-input-text
+
+    this.handleValueChanged = () => { 
+        this.filter(document.getElementById("filter").rawValue);
+        console.log("Filter value changed: ", this.filter());
+      };
+5. Make the dataprovider for the table a computed function, 
+   based on the input received on the filter input text box. Most importantly
+   wrap it into ListDataProviderView
+
+   const filterRegEx = new RegExp(this.filter(), "i");
+          const filterCriterions = {
+              op: "$or",
+              criteria: [
+                  { op: "$regex", value: { DepartmentId: filterRegEx } },
+                  { op: "$regex", value: { DepartmentName: filterRegEx } },
+                  { op: "$regex", value: { LocationId: filterRegEx } },
+                  { op: "$regex", value: { ManagerId: filterRegEx } },
+              ],
+          };
+          const arrayDataProvider = new ArrayDataProvider(this.deptArray, { keyAttributes: "DepartmentId" });
+          return new ListDataProviderView(arrayDataProvider, { filterCriterion: filterCriterions });
+
+RESULT: This should create the filtering effect on the table data
+
+Part 6: Working with cell rendering functions
+-----------------------------------------------------------------------------------
+
+view: incidents.html
+
+Add oj-table to the view, but this time donot specify the column specificaitons.
+We will feed the specifications through columnArray
+
+Copy the following mark-up:
+    <h3>Table with cell rendering functions</h3>
+    <oj-table id='table' aria-label='Departments Table'
+                         data='[[dataprovider]]' 
+                         scroll-policy='loadMoreOnScroll'
+                         columns-default.sortable='disabled'
+                         columns='{{columnArray}}' 
+                         class='demo-table-container oj-bg-body'
+                         style='width: 100%; height:50%;'>
+    </oj-table>
+
+ViewModel:
+
+1. Define the cell rendering function:
+this.highlightingCellRenderer = (context) => {
+        let field = null;
+        if (context.columnIndex === 0) {
+            field = "DepartmentId";
+        }
+        else if (context.columnIndex === 1) {
+            field = "DepartmentName";
+        }
+        else if (context.columnIndex === 2) {
+            field = "LocationId";
+        }
+        else if (context.columnIndex === 3) {
+            field = "ManagerId";
+        }
+        let data = context.row[field].toString();
+        const filterString = this.filter();
+        let textNode;
+        let spanNode = document.createElement("span");
+        if (filterString && filterString.length > 0) {
+            const index = data.toLowerCase().indexOf(filterString.toLowerCase());
+            if (index > -1) {
+                const highlightedSegment = data.substr(index, filterString.length);
+                if (index !== 0) {
+                    textNode = document.createTextNode(data.substr(0, index));
+                    spanNode.appendChild(textNode);
+                }
+                let bold = document.createElement("b");
+                textNode = document.createTextNode(highlightedSegment);
+                bold.appendChild(textNode);
+                spanNode.appendChild(bold);
+                if (index + filterString.length !== data.length) {
+                    textNode = document.createTextNode(data.substr(index + filterString.length, data.length - 1));
+                    spanNode.appendChild(textNode);
+                }
+            }
+            else {
+                textNode = document.createTextNode(data);
+                spanNode.appendChild(textNode);
+            }
+        }
+        else {
+            textNode = document.createTextNode(data);
+            spanNode.appendChild(textNode);
+        }
+        context.parentElement.appendChild(spanNode);
+    };
+
+2. Define the columnArray:
+
+    this.columnArray = [
+        { headerText: "Department Id", renderer: this.highlightingCellRenderer },
+        { headerText: "Department Name", renderer: this.highlightingCellRenderer },
+        { headerText: "Location Id", renderer: this.highlightingCellRenderer },
+        { headerText: "Manager Id", renderer: this.highlightingCellRenderer },
+    ];
+
+
+Part 7: Editable table
+-----------------------------------------------------------------------------------
+View: customers.html
+
+1. Add oj-table with template attributes 
+
+        <oj-table id="table"
+                  aria-label="Departments Table"
+                  data='[[dataprovider]]'
+                  class='oj-bg-body'
+                  edit-mode='rowEdit'
+                  edit-row='{{editRow}}'
+                  on-oj-before-row-edit='[[beforeRowEditListener]]'
+                  on-oj-before-row-edit-end='[[beforeRowEditEndListener]]'
+                  columns-default.sortable='disabled'
+                  columns='[{"field": "EmployeeId",
+                              "headerText": "Employee Id",
+                              "headerClassName": "oj-helper-text-align-end",
+                              "width": 100,
+                              "className": "oj-helper-text-align-end oj-read-only",
+                              "template": "empIdTemplate"},
+                              {"headerText": "Employee Name",
+                              "className": "oj-read-only",
+                              "width": 200,
+                              "template": "empNameTemplate"},
+                              {"field":"salary",
+                              "headerText": "Salary",
+                              "headerClassName": "oj-helper-text-align-end",
+                              "className": "oj-helper-text-align-end",
+                              "width": 200,
+                              "template": "salaryTemplate"},
+                              {"field":"bonus",
+                              "headerText": "Bonus",
+                              "headerClassName": "oj-helper-text-align-end",
+                              "className": "oj-helper-text-align-end",
+                              "width": 200,
+                              "template": "bonusTemplate"},
+                              {"headerText": "Total Compensation",
+                              "headerClassName": "oj-helper-text-align-end",
+                              "className": "oj-helper-text-align-end oj-read-only",
+                              "width": 200,
+                              "template": "totalTemplate"}
+                              ]'>
+        </oj-table>
+
+2. Add template definitions for all the cells:
+   Remember to write these in between <oj-table></oj-table>
+   Reference with oj-table documentation to get an idea of what everything means
+
+          <template slot="empIdTemplate" data-oj-as="cell">
+              <oj-bind-text value="[[numberConverter.format(cell.data)]]"></oj-bind-text>
+          </template>
+          
+          <template slot="empNameTemplate" data-oj-as="cell">
+              <oj-bind-text value="[[cell.row.FirstName + ' ' + cell.row.LastName]]"></oj-bind-text>
+          </template>
+          
+          <template slot="salaryTemplate" data-oj-as="cell">
+              <oj-bind-if test='[[cell.mode=="navigation"]]'>
+                  <oj-bind-text value="[[numberConverter.format(cell.data)]]"></oj-bind-text>
+              </oj-bind-if>
+          
+          
+              <oj-bind-if test='[[cell.mode=="edit"]]'>
+                  <oj-input-number value="{{rowData.salary}}" min=1000 max=1500000 step=0 on-value-changed="{{valueChange}}" class="editable"></oj-input-number>
+              </oj-bind-if>
+          </template>
+          
+          <template slot="bonusTemplate" data-oj-as="cell">
+              <oj-bind-if test='[[cell.mode=="navigation"]]'>
+                  <oj-bind-text value="[[numberConverter.format(cell.data)]]"></oj-bind-text>
+              </oj-bind-if>
+          
+          
+              <oj-bind-if test='[[cell.mode=="edit"]]'>
+                  <oj-input-number value="{{rowData.bonus}}" min=1000 max=1500000 step=0 on-value-changed="{{valueChange}}" class="editable"></oj-input-number>
+              </oj-bind-if>
+          </template>
+          
+          
+          <template slot="totalTemplate" data-oj-as="cell">
+              <oj-bind-if test='[[cell.mode=="navigation"]]'>
+                  <oj-bind-text value="[[numberConverter.format(cell.row.salary + cell.row.bonus)]]"></oj-bind-text>
+              </oj-bind-if>
+          
+          
+              <oj-bind-if test='[[cell.mode=="edit"]]'>
+                  <oj-bind-text value="[[numberConverter.format(rowData.total())]]"></oj-bind-text>
+              </oj-bind-if>
+          </template>
+
+ViewModel:
+
+Required modules:
+"accUtils","require", "exports", "ojs/ojbootstrap", "ojs/ojconverter-number", "ojs/ojarraydataprovider", 
+"knockout", "ojs/ojknockout", "ojs/ojinputtext", "ojs/ojtable"
+
+1. Create an array empArray to feed the table. Use data from tabledata.txt
+    this.empObservableArray = ko.observableArray(this.empArray);
+    this.dataprovider = new ArrayDataProvider(this.empObservableArray, {
+        keyAttributes: "EmployeeId",
+    });
+
+2. Define editRow as observable, numberConverter as an InternationalNumberConverter Object
+    this.numberConverter = new ojconverter_number_1.IntlNumberConverter();
+    this.editRow = ko.observable();
+
+3. Implement valueChange() to handle on-value-changed attribute
+    this.valueChange = () => {
+        this.rowData.total(this.rowData.salary + this.rowData.bonus);
+    };
+
+4. Implement the listner functions
+    this.beforeRowEditListener = (event) => {
+        this.rowData = Object.assign({}, event.detail.rowContext.item.data);
+        this.rowData.total = ko.observable(this.rowData.salary + this.rowData.bonus);
+    };
+
+    //ojBeforeRowEditEnd 
+    this.beforeRowEditEndListener = (event) => {
+        const detail = event.detail;
+        if (!detail.cancelEdit) {
+            if (this.hasValidationErrorInRow(document.getElementById("table"))) {
+                event.preventDefault();
+            }
+            else {
+                const rowIndex = this.empObservableArray.indexOf(detail.rowContext.item.data);
+                this.empObservableArray.splice(rowIndex, 1, this.rowData);
+                document.getElementById("rowDataDump").value = JSON.stringify(this.rowData);
+            }
+        }
+    };
+
+RESULT: This should give you an live editable table
+
+Part 8: Table with CRUD functionality
+-----------------------------------------------------------------------------------
+
+view: about.js
+
+1. Create a form element:
+   Inputs: Department ID, Department Name ID, Manager ID, Location ID
+   Buttons: Add, Update, Remove
+
+        <oj-validation-group valid="{{groupValid}}">
+            <oj-form-layout>
+                <oj-input-number id="departmentIdInput" max="2000" min="0" label-hint="Department Id"
+                                value="{{inputDepartmentId}}" converter='[[converter]]'></oj-input-number>
+                <oj-input-text id="departmentNameInput" label-hint="Department Name" value="{{inputDepartmentName}}"></oj-input-text>
+                <oj-input-number id="locationIdInput" label-hint="Location Id" max="2000" min="0"
+                                value="{{inputLocationId}}" converter='[[converter]]'></oj-input-number>
+                <oj-input-number id="managerIdInput" label-hint="Manager Id" max="2000" min="0"
+                                value="{{inputManagerId}}" converter='[[converter]]'></oj-input-number>
+            </oj-form-layout>
+            
+            <oj-toolbar chroming='outlined'>
+              <oj-button id='addbutton' on-oj-action='[[addRow]]' disabled='[[disableCreate]]'>Create</oj-button>
+              <oj-button id='updateButton' on-oj-action='[[updateRow]]' disabled='[[disableRemoveUpdate]]'>Update</oj-button>
+              <oj-button id='removeButton' on-oj-action='[[removeRow]]' disabled='[[disableRemoveUpdate]]'>Remove</oj-button>
+            </oj-toolbar>
+
+          </oj-validation-group>
+
+2. Create a table element, in which you can select rows:
+   Let it have a Reset and Submit button
+
+        <div id='tableContainer' class="oj-flex-item oj-web-padding">
+
+          <oj-table id="table" aria-label="Departments Table"
+                  class="demo-table-container oj-bg-body"
+                  data='[[dataprovider]]'
+                  columns='[{"headerText": "Department Id", "field": "DepartmentId"},
+                              {"headerText": "Department Name", "field": "DepartmentName"},
+                              {"headerText": "Location Id", "field": "LocationId"},
+                              {"headerText": "Manager Id", "field": "ManagerId"}]'
+                  selection-mode.row='single'
+                  first-selected-row='{{firstSelected}}'
+                  on-first-selected-row-changed="[[firstSelectedRowChangedListener]]">
+          </oj-table>
+
+          <div id="noDataDiv" class="oj-flex demo-table-container">
+              <div class="oj-flex-item oj-sm-align-self-center">
+              <span>No data available. Please use the form controls to create a new row.</span>
+              </div>
+          </div>
+
+          <oj-toolbar chroming='outlined'>
+              <oj-button id='resetButton' on-oj-action='[[resetRows]]' disabled='[[disableSubmit]]'>Reset Changes</oj-button>
+              <oj-button id='submitButton' on-oj-action='[[submitRows]]' disabled='[[disableSubmit]]'>Submit Changes</oj-button>
+          </oj-toolbar>
+
+        </div>
+
+ViewModel:
+
+Required Modules:
+"accUtils","require", "exports", "knockout", "ojs/ojbootstrap", "ojs/ojarraydataprovider", 
+"ojs/ojbufferingdataprovider", "ojs/ojkeyset", "ojs/ojconverter-number", "ojs/ojcontext", "ojs/ojknockout", "ojs/ojinputtext", "ojs/ojinputnumber", "ojs/ojlabel", "ojs/ojvalidationgroup", 
+"ojs/ojformlayout", "ojs/ojtoolbar", "ojs/ojmessages", "ojs/ojtable"
+
+1. Create a buffering data provider for the table
+   Remember ArrayDataProvider does not support adding or removing items
+
+      var deptArray = []; // Copy from tabledata.txt
+      this.deptObservableArray = ko.observableArray(this.deptArray);
+      this.dataprovider = new BufferingDataProvider(new ArrayDataProvider(this.deptObservableArray, {
+                  keyAttributes: "DepartmentId",
+              }));
+
+
+2. All observables are declared
+
+      // Declare all the observables necessary for the form side
+
+      this.inputDepartmentId = ko.observable();
+      this.inputDepartmentName = ko.observable();
+      this.inputLocationId = ko.observable();
+      this.inputManagerId = ko.observable();
+      this.firstSelected = ko.observable();
+      this.disableSubmit = ko.observable(true);
+
+      // Declare all the observables for the table side
+
+      this.isEmptyTable = ko.observable(false);
+      this.groupValid = ko.observable();      
+
+      // Other observables misc
+
+      this.messageArray = ko.observableArray();
+
+      this.converter = new NumberConverter.IntlNumberConverter({
+        useGrouping: false,
+      });
+
+3. Define all the button actions in the form element
+
+      // Return true if the Create button should be disabled
+      this.disableCreate = ko.computed(() => {
+        return !this.inputDepartmentId() || this.groupValid() === "invalidShown";
+      });
+
+      // Return true if the Remove and Update buttons should be disabled
+      this.disableRemoveUpdate = ko.computed(() => {
+          const firstSelected = this.firstSelected();
+          return (!firstSelected ||
+              !firstSelected.key ||
+              this.groupValid() === "invalidShown");
+      });
+
+      // Add a new row
+      this.addRow = () => {
+        if (this.groupValid() !== "invalidShown") {
+            const dept = {
+                DepartmentId: this.inputDepartmentId(),
+                DepartmentName: this.inputDepartmentName(),
+                LocationId: this.inputLocationId(),
+                ManagerId: this.inputManagerId(),
+            };
+            this.dataprovider.addItem({
+                metadata: { key: dept.DepartmentId },
+                data: dept,
+            }); 
+        }
+      };
+
+      // Update the selected row
+      this.updateRow = () => {
+          if (this.groupValid() !== "invalidShown") {
+              const element = document.getElementById("table");
+              const currentRow = element.currentRow;
+              console.log("[UPDATE]", currentRow);
+              if (currentRow != null) {
+                  const key = this.inputDepartmentId();
+                  const newData = {
+                      DepartmentId: this.inputDepartmentId(),
+                      DepartmentName: this.inputDepartmentName(),
+                      LocationId: this.inputLocationId(),
+                      ManagerId: this.inputManagerId(),
+                  };
+                  this.dataprovider.updateItem({ metadata: { key: key }, data: newData });
+              }
+          }
+      };
+
+      // Remove the selected row
+      this.removeRow = () => {
+          const element = document.getElementById("table");
+          const currentRow = element.currentRow;
+          if (currentRow != null) {
+              const dataObj = element.getDataForVisibleRow(currentRow.rowIndex);
+              this.dataprovider.removeItem({
+                  metadata: { key: dataObj.key },
+                  data: dataObj.data,
+              });
+              // Clear the table selection
+              element.selected = { row: new ojkeyset_1.KeySetImpl(), column: new ojkeyset_1.KeySetImpl() };
+          }
+      };
+
+4. Define all the reset and submit button actions
+
+      // Reset all rows to discard buffered changes
+      this.resetRows = () => {
+          this.dataprovider.resetAllUnsubmittedItems();
+          if (this.dataprovider.isEmpty() === "yes") {
+              this.isEmptyTable(true);
+          }
+
+          // An example to send data to the messageArray
+          this.messageArray([
+              {
+                  severity: "confirmation",
+                  summary: "Changes have been reset.",
+                  autoTimeout: 4000,
+              },
+          ]);
+      };
+
+      
+      // Submit required special treatment as follows:
+
+      this.findIndex = (key) => {
+        const ar = this.deptObservableArray();
+        for (let idx = 0; idx < this.deptObservableArray().length; idx++) {
+            if (ar[idx].DepartmentId === key) {
+                return idx;
+            }
+        }
+        return -1;
+      };
+
+      // Commit a row to the data source
+      // Any changes reflects on the BufferingDataProvider
+      // These changes should be committed to the the core data provider
+
+      this.commitOneRow = (editItem) => {
+        const idx = this.findIndex(editItem.item.metadata.key);
+        let error;
+        if (idx > -1) {
+            if (editItem.operation === "update") {
+                this.deptObservableArray.splice(idx, 1, editItem.item.data);
+            }
+            else if (editItem.operation === "remove") {
+                this.deptObservableArray.splice(idx, 1);
+                if (this.dataprovider.isEmpty() === "yes") {
+                    this.isEmptyTable(true);
+                }
+            }
+            else {
+                error = {
+                    severity: "error",
+                    summary: "add error",
+                    detail: "Row with same key already exists",
+                };
+            }
+        }
+        else {
+            if (editItem.operation === "add") {
+                this.deptObservableArray.splice(this.deptObservableArray().length, 0, editItem.item.data);
+            }
+            else {
+                error = {
+                    severity: "error",
+                    summary: editItem.operation + " error",
+                    detail: "Row for key cannot be found",
+                };
+            }
+        }
+        if (error) {
+            return Promise.reject(error);
+        }
+        return Promise.resolve();
+      };
+
+
+      // Submit the unsubmitted items
+      this.submitRows = () => {
+
+        this.disableSubmit(true);
+
+        // Get all the submittable items
+        const editItems = this.dataprovider.getSubmittableItems();
+        editItems.forEach((editItem) => {
+            // Set each edit item to "submitting" status before data submission
+            this.dataprovider.setItemStatus(editItem, "submitting");
+            // DepartmentData
+            // Commit data
+            this.commitOneRow(editItem)
+                .then(() => {
+                // Set the edit item to "submitted" if successful
+                this.dataprovider.setItemStatus(editItem, "submitted");
+                })
+                .catch((error) => {
+                // Set the edit item back to "unsubmitted" with error if not successful
+                this.dataprovider.setItemStatus(editItem, "unsubmitted", error);
+                var errorMsg = {
+                    severity: error.severity,
+                    summary: error.summary,
+                    autoTimeout: 4000,
+                };
+                this.messageArray.push(errorMsg);
+            });
+        });
+        this.messageArray([
+            {
+                severity: "confirmation",
+                summary: "Changes have been submitted.",
+                autoTimeout: 4000,
+            },
+        ]);
+      };
+
+5. Write functions that can update the form when the row is selected
+
+      // Listener for updating the form when row selection changes in the table
+      this.firstSelectedRowChangedListener = (event) => {
+                const itemContext = event.detail.value;
+                if (itemContext && itemContext.data) {
+                    const dept = itemContext.data;
+                    this.inputDepartmentId(dept.DepartmentId);
+                    this.inputDepartmentName(dept.DepartmentName);
+                    this.inputLocationId(dept.LocationId);
+                    this.inputManagerId(dept.ManagerId);
+                }
+      };      
+
+6. Updating UI 
+
+      // Show all submittable edit items
+      this.showSubmittableItems = (submittable) => {
+          const textarea = document.getElementById("bufferContent");
+          let textValue = "";
+          submittable.forEach((editItem) => {
+                    textValue += editItem.operation + " ";
+                    textValue += editItem.item.metadata.key + ": ";
+                    textValue += JSON.stringify(editItem.item.data);
+                    if (editItem.item.metadata.message) {
+                        textValue +=
+                            " error: " + JSON.stringify(editItem.item.metadata.message);
+                    }
+                    textValue += "\n";
+            });
+            textarea.value = textValue;
+        };
+
+      this.dataprovider.addEventListener("submittableChange", (event) => {
+        // BufferingDataProvider fires the "submittableChange" event whenever there is a change in the number of submittable items.
+        // We can use this to update the UI.
+        const submittable = event.detail;
+        this.disableSubmit(submittable.length === 0);
+        this.showSubmittableItems(submittable);
+      });
+
+      this.dataprovider.addEventListener("mutate", (event) => {
+        if (this.isEmptyTable() === true && event.detail.add != null) {
+            this.isEmptyTable(false);
+        }
+      });
+
+
+
+
+RESULT: A CRUD enabled table applications should be realized
+
+CREATIVE LAB:
+-----------------------------------------------------------------------------------
+
+1. Explore drag and drop to a chart
+   Refer: OJET Cookbook
+
+
+-----------------------------------------------------------------------------------
+LAB 9: OJET Responsive Designs
+-----------------------------------------------------------------------------------
+Objective:
+Understand media queries in CSS
+To explore the layout techniques in OJET
+To learn the usage of oj-flex and oj-flex-item
+
+STEP 1:
+
+Choose a view: say about.html
+oj-flex  -> flex container
+oj-flex-item
+
+STEP 2:
+Create internal panels
+oj-panel
+
+STEP 3:
+Distinguish between the panels using colors 
+Use normal CSS styling
+
+STEP 4:
+Add other ojet components into the containers
+Follow the three step process for adopting OJET cookbook recepies
+
+
+about.html will look like this:
+
+<div class="oj-flex">
+  
+    <div class="oj-flex-item oj-panel" style="margin: 10px; background-color:Coral">
+      <h4>Ramesh</h4>
+      <strong>20+ years of experience in Production Management.</strong>
+      <br>
+      <br>
+      <oj-chart type = "bar" series ="[[datasource1]]">
+      </oj-chart>
+    </div>
+
+    <div class="oj-flex-item oj-panel" style="margin: 10px; background-color:SlateBlue">
+      <h4>Kumar</h4>
+      <strong>18+ years of experience in Electrical Assembly </strong>
+      <br>
+      <br>
+      <oj-chart type = "bar" series ="[[datasource2]]">
+      </oj-chart>
+    </div>
+
+    <div class="oj-flex-item oj-panel" style="margin: 10px; background-color:Khaki">
+      <h4>Sadhana</h4>
+      <strong>19+ years of experience in Electronic Product R & D </strong>
+      <br>
+      <br>
+      <oj-chart type = "bar" series ="[[datasource3]]">
+      </oj-chart>
+    </div>
+</div>
+
+viewModel: about.js
+
+      var self = this;
+
+      // ----------------------------------------------------------------
+
+      var data1 = [
+        {name:"Papers Published", items:[12]},
+        {name:"Projects Completed", items:[14]},
+        {name:"Team Size", items:[28]}   
+      ];
+
+      var data2 = [
+              {name:"Papers Published", items:[10]},
+              {name:"Projects Completed", items:[18]},
+              {name:"Team Size", items:[8]}   
+            ]; 
+      
+      var data3 = [
+              {name:"Papers Published", items:[17]},
+              {name:"Projects Completed", items:[8]},
+              {name:"Team Size", items:[18]}   
+            ];
+
+      self.datasource1 = ko.observableArray(data1);
+      self.datasource2 = ko.observableArray(data2);
+      self.datasource3 = ko.observableArray(data3);
+
+CREATIVE LAB: 
+-----------------------------------------------------------------------------------
+
+1. How do you add a photograph of the person to the container
+2. Explore the Masonry Layout models
+
+
+-----------------------------------------------------------------------------------
+LAB 10: Rest API experiments 
+-----------------------------------------------------------------------------------
+Objective:
+To use ajax() for fetching data from a Rest API end point
+TO experiment with the available data
+
+URL: https://restcountries.eu/rest/v2/all
+
+Analyse the fields/contents using the jQuery ajax call:
+$.ajax({
+            url: "https://restcountries.eu/rest/v2/all",
+            type: "GET",
+            crossDomain: true,
+            dataType: "json" });
+
+Print the following information from the data received from the URL
+name, capital, population, region, subregion, timezones ---> India
+
+-----------------------------------------------------------------------------------
+LAB 11: Working with the Common Model
+-----------------------------------------------------------------------------------
+Objective:
+To implement the common model to capture the data from the REST endpoint
+
+URL: https://apex.oracle.com/pls/apex/oraclejet/lp/activities/
+
+
+Step 1:
+customers.html
+
+<oj-table id="table" summary="Common Model" aria-label="Common Model Demo"
+                                        data='[[datasource]]' 
+                                        columns='[
+                                        {"headerText": "Name", "field": "name"},
+                                        {"headerText": "Description", "field": "short_desc"}
+                                        ]'>
+</oj-table>
+
+Step 2:
+customers.js
+
+Required Modules:
+        'knockout', 
+        'ojs/ojcollectiondataprovider', 
+        "ojs/ojmodel", 
+        "ojs/ojtable"
+
+
+      self.parseData = function(response) {
+        return {name: response['name'],
+            short_desc: response['short_desc']
+        };
+      };
+
+      self.serviceURL = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/";
+      self.Department = Model.Model.extend({
+              urlRoot: self.serviceURL,
+              parse: self.parseData,
+              idAttribute: 'id'
+          }); 
+      
+      self.DeptCol = ko.observable();
+      self.datasource = ko.observable();
+      self.myDept = new self.Department();
+
+      // Create a base object "class" for the entire dataset
+      self.DeptCollection = Model.Collection.extend({
+              url: self.serviceURL + "?limit=50",
+              model: self.myDept
+          });
+
+      // Create a specific instance for the departments.  This will be filled with instances of the
+      // model "department" for each record when the data is retrieved from the data service
+      self.DeptCol(new self.DeptCollection());
+
+      
+      self.datasource(new CollectionDataProvider(self.DeptCol()));
+
+CREATIVE LAB:
+-----------------------------------------------------------------------------------
+
+Repeat Lab 10 with:
+URL: https://restcountries.eu/rest/v2/all
+
+1. Add pagination to the table
+2. Name, Capital, Population, Time Zone
+
+
+Additionally,
+1. Add sort, select and pagination functionality to the table
+2. Add filtering ability to the application
+3. Add a chart which compares India details with the selected country in the table
