@@ -1,0 +1,25 @@
+<!--
+ Copyright (c) 2014, 2022, Oracle and/or its affiliates.
+ Licensed under The Universal Permissive License (UPL), Version 1.0
+ as shown at https://oss.oracle.com/licenses/upl/
+ -->
+<div class="oj-hybrid-padding">
+  <h1>Dashboard Content Area</h1>
+  <h3 style="color:red">This is my first experiment in OJET environment</h3>
+  <hr>
+  <div>
+    <h6>Name : <input data-bind="textInput:name"> </h6>
+    <h6>Age  : <input data-bind="value:age"> </h6>
+    <hr>
+    <h3>Your name is <span data-bind="text:name"> </span> and age is <span data-bind="text:age"> </span><h3>
+  </div>
+
+  <h3>Please follow the statistics</h3>
+  <oj-chart type = "bar" series ="[[datasource]]">
+  </oj-chart>
+
+  <h3>Your time should be distributed the following way</h3>
+  <oj-chart type = "pie" series ="[[datasource2]]">
+  </oj-chart>
+
+</div>
