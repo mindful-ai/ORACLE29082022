@@ -1,0 +1,27 @@
+MV* Architectures:
+https://livebook.manning.com/book/spa-design-and-architecture/chapter-2/74
+https://medium.com/@ankit.sinhal/mvc-mvp-and-mvvm-design-pattern-6e169567bbad
+https://medium.com/ios-expert-series-or-interview-series/mvc-vs-mvp-vs-mvvm-13cc6ab43a4c
+https://www.geeksforgeeks.org/difference-between-mvc-mvp-and-mvvm-architecture-pattern-in-android/
+
+Media Queries:
+
+https://css-tricks.com/a-complete-guide-to-css-media-queries/
+
+# Important Links 
+
+https://www.htmlquick.com/reference/tags/slot.html
+https://javascript.info/slots-composition
+https://www.html5rocks.com/en/tutorials/webcomponents/customelements/
+
+
+OJET Related:
+
+https://docs.oracle.com/en/middleware/developer-tools/jet/9.2/develop/understanding-web-application-workflow.html
+https://docs.oracle.com/en/middleware/developer-tools/jet/9.2/webapplications.html
+
+------------------ Restoring OJET applications ------------------
+   
+   $ npm install -g @oracle/ojet-cli
+   $ npm install -g @oracle/oraclejet-tooling 
+   $ ojet restore
