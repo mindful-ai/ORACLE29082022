@@ -1,0 +1,74 @@
+<!--
+ Copyright (c) 2014, 2021, Oracle and/or its affiliates.
+ Licensed under The Universal Permissive License (UPL), Version 1.0
+ as shown at https://oss.oracle.com/licenses/upl/
+ -->
+<div class="oj-hybrid-padding">
+  <h1>oj-table Demonstration</h1>
+  <ul>
+    <li>Implementation</li>
+    <li>Sorting abilities</li>
+    <li>Adding pagination</li>
+    <li>Drag and Drop</li>
+    <li>Changing colors</li>
+  </ul>
+  <div class="">
+    <h3>Table Master</h3>
+    <div class="oj-panel">
+      <oj-table id='table' 
+                class="oj-bg-success-20"
+                aria-label='Departments Table'
+                data='[[pagingDataProvider]]' 
+                selection-mode='{"row": "multiple", "column": "multiple"}'
+                dnd.drag.rows.data-types='["application/ojtablerows+json"]'
+                columns-default.sortable='disabled' 
+                columns='[{"headerText": "Department Id", 
+                          "field": "DepartmentId",
+                          "headerClassName": "oj-sm-only-hide",
+                          "className": "oj-sm-only-hide"},
+                          {"headerText": "Department Name", 
+                          "field": "DepartmentName",
+                          "sortable": "enabled"},
+                          {"headerText": "Location Id", 
+                          "field": "LocationId",
+                          "headerClassName": "oj-sm-only-hide",
+                          "className": "oj-sm-only-hide"},
+                          {"headerText": "Manager Id", 
+                          "field": "ManagerId"}]'
+                style='width: 100%; height:100%;'>
+            <oj-paging-control id="paging" data='[[pagingDataProvider]]' page-size='5' slot='bottom'>
+            </oj-paging-control>
+      </oj-table>
+    </div>
+
+    <br>
+    <h3>Table Slave</h3>
+    <div class="oj-panel">
+      <oj-table id='table' 
+                class="oj-bg-danger-30"
+                aria-label='Departments Table'
+                data='[[dataprovider2]]'
+                selection-mode='{"row": "multiple", "column": "multiple"}'
+                dnd.drop.rows.data-types='["application/ojtablerows+json"]'
+                dnd.drop.rows.drop='[[handleDropRows]]'
+                columns-default.sortable='disabled' 
+                columns='[{"headerText": "Department Id", 
+                          "field": "DepartmentId",
+                          "headerClassName": "oj-sm-only-hide",
+                          "className": "oj-sm-only-hide"},
+                          {"headerText": "Department Name", 
+                          "field": "DepartmentName",
+                          "sortable": "enabled"},
+                          {"headerText": "Location Id", 
+                          "field": "LocationId",
+                          "headerClassName": "oj-sm-only-hide",
+                          "className": "oj-sm-only-hide"},
+                          {"headerText": "Manager Id", 
+                          "field": "ManagerId"}]'
+                style='width: 100%; height:100%;'>
+
+      </oj-table>
+    </div>
+
+  </div>
+</div>
