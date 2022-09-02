@@ -23,6 +23,8 @@ define([ "ojs/ojcorerouter",
         this.routes = [
             { path: "", redirect: "table" },
             { path: "table", detail: { label: "Table" } },
+            { path: "edit", detail: { label: "Edit Table" } },
+            { path: "crud", detail: { label: "CRUD Table" } },
             { path: "rest", detail: { label: "ReST" } },
             { path: "other", detail: { label: "Other" } },
 
